@@ -24,39 +24,46 @@ public:
         auto* newPtr = new Node(newNode);   //create new pointer and add to vector of pointers
         nodePtrs.push_back(newPtr);
     }
+
+    void populateGraph(){
+        int nodes, edges; std::cin >> nodes >> edges;  //get nodes and edges from user input
+
+        nodePtrs.push_back(nullptr);
+        //populate graph with nodes, starting at index 1
+        for (int nodeInd = 1 ; nodeInd <= nodes ; ++nodeInd) {
+            addNode(nodeInd);
+        }
+
+        //specify edges connecting nodes
+        while (edges--) {
+            unsigned long nodeNum1, nodeNum2;
+            std::cin >> nodeNum1 >> nodeNum2;
+            Node* node1Ptr = nodePtrs.at(nodeNum1);               //create pointers to nodes
+            Node* node2Ptr = nodePtrs.at(nodeNum2);
+            node1Ptr->links.push_back(node2Ptr);   //add pointer to Node at NodeNum1
+            node2Ptr->links.push_back(node1Ptr);   //add pointer to Node at NodeNum2
+        }
+    }
 };
 
-void populateGraph(Graph& grph){
-    int nodes, edges; std::cin >> nodes >> edges;  //get nodes and edges from user input
 
-    grph.nodePtrs.push_back(nullptr);
-    //populate graph with nodes, starting at index 1
-    for (int nodeInd = 1 ; nodeInd <= nodes ; ++nodeInd) {
-        grph.addNode(nodeInd);
-    }
-
-    //specify edges connecting nodes
-    while (edges--) {
-        unsigned long nodeNum1, nodeNum2;
-        std::cin >> nodeNum1 >> nodeNum2;
-        Node* node1Ptr = grph.nodePtrs.at(nodeNum1);               //create pointers to nodes
-        Node* node2Ptr = grph.nodePtrs.at(nodeNum2);
-        node1Ptr->links.push_back(node2Ptr);   //add pointer to Node at NodeNum1
-        node2Ptr->links.push_back(node1Ptr);   //add pointer to Node at NodeNum2
-    }
-}
-
-class BFStracking {
+class BFShelper {
 public:
-    int dist = 6;
-    std::vector<int> explored {};
-    std::queue<Node*> que {};
+    int dist;
+    std::vector<int> explored;
+    std::queue<Node*> que;
+
+    explicit BFShelper(int initDist=6) {
+        dist = initDist;
+        explored = {};
+        que = {};
+    }
 
     void increment(int amt=6){
         dist += amt;
     }
-    void addToExplored(Node* exploredNodePtr){
-        explored.push_back(exploredNodePtr->val);
+    void addToExplored(Node* exploredPtr){
+        explored.push_back(exploredPtr->val);
     }
     void enQue(Node* nodePtr){
         que.push(nodePtr);
@@ -67,16 +74,17 @@ public:
     }
 };
 
-int breadthFirstSearch(int search, BFStracking& track, Node* startPtr = nullptr) {
+
+int breadthFirstSearch(int search, BFShelper& track, Node* startPtr = nullptr) {
     if (startPtr == nullptr) {
         startPtr = track.deQue();
     }
     track.addToExplored(startPtr);
-    for (Node* pntr : startPtr->links) {
-        if (pntr->val == search) {
+    for (Node* link : startPtr->links) {
+        if (link->val == search) {
             return track.dist;
-        } else if (std::find(track.explored.begin(), track.explored.end(), pntr->val) == track.explored.end()) {
-            track.enQue(pntr);
+        } else if (std::find(track.explored.begin(), track.explored.end(), link->val) == track.explored.end()) {
+            track.enQue(link);
         }
     }
     track.increment();
@@ -86,8 +94,8 @@ int breadthFirstSearch(int search, BFStracking& track, Node* startPtr = nullptr)
     else {
         return -1;
     }
-
 }
+
 
 int main() {
     int queries; std::cin >> queries;       //get number of queries from user input
@@ -95,13 +103,13 @@ int main() {
     //for each query:
     while (queries--) {
         Graph grph;                 //create new graph object
-        populateGraph(grph);        //populate Graph
+        grph.populateGraph();        //populate Graph
         unsigned long start; std::cin >> start;
         Node* startPtr = grph.nodePtrs.at(start);
         for (Node* nodePtr : grph.nodePtrs) {
             if (nodePtr == nullptr or nodePtr->val == start) { ; }
             else {
-                BFStracking tracker;
+                BFShelper tracker;
                 std::cout << breadthFirstSearch(nodePtr->val, tracker, startPtr) << " ";
             }
         }
