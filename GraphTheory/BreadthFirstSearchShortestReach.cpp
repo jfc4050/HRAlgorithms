@@ -5,10 +5,8 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <algorithm>
 
-class Node {
-public:
+struct Node {
     int val;
     std::vector<Node*> links {};
 
@@ -30,8 +28,6 @@ public:
 
 void populateGraph(Graph& grph){
     int nodes, edges; std::cin >> nodes >> edges;  //get nodes and edges from user input
-//    int nodes = 3;
-//    int edges = 1;
 
     grph.nodePtrs.push_back(nullptr);
     //populate graph with nodes, starting at index 1
@@ -43,8 +39,6 @@ void populateGraph(Graph& grph){
     while (edges--) {
         unsigned long nodeNum1, nodeNum2;
         std::cin >> nodeNum1 >> nodeNum2;
-//        int nodeNum1 = 1;
-//        int nodeNum2 = 2;
         Node* node1Ptr = grph.nodePtrs.at(nodeNum1);               //create pointers to nodes
         Node* node2Ptr = grph.nodePtrs.at(nodeNum2);
         node1Ptr->links.push_back(node2Ptr);   //add pointer to Node at NodeNum1
