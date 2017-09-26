@@ -77,26 +77,7 @@ private:
         return false;
     }
 
-    void printVisited() {
-        for (std::pair<int, int> coord : visitedPairs) {
-            printPair(coord);
-        }
-        std::cout << "\n";
-    }
-
-    void printPair(std::pair<int, int> coord) {
-        std::cout << "(" << coord.first << "," << coord.second << ")" << " ";
-    }
-
 public:
-    Knight() {
-        location = std::make_pair(0, 0);
-        que.push(location);
-        visitedPairs.push_back(location);
-        aRange = 0;
-        bRange = 0;
-    }
-
     Knight(int aIn = 1, int bIn = 3, int boundIn = 5) {
         location = std::make_pair(0, 0);
         bound = boundIn;
@@ -125,7 +106,7 @@ public:
 
         while (!que.empty()) {
             while (!que.empty()) {
-                std::pair<int, int> &current = que.front();
+                std::pair<int, int>& current = que.front();
                 que.pop();
                 if (current == target) {
                     return moves;
@@ -158,7 +139,6 @@ public:
 int main() {
     int bound;
     std::cin >> bound;
-//    bound = 5;
 
     for (int i = 1 ; i < bound ; ++i) {
         for (int j = 1 ; j < bound ; ++j) {
