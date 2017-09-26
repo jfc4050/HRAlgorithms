@@ -2,6 +2,8 @@
 // Created by Justin on 9/26/17.
 //
 
+#define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
+
 #include <iostream>
 #include <utility>
 #include <queue>
@@ -12,7 +14,6 @@ class Knight {
 private:
     std::pair<int, int> location;
     std::queue<std::pair<int, int> > que;
-    std::vector<std::pair<int, int> > check;
     std::vector<std::pair<int, int> > visitedPairs;
     std::vector<std::pair<int, int> > currentLevel;
     int aRange;
@@ -76,13 +77,6 @@ private:
         return false;
     }
 
-    void printCheck() {
-        for (std::pair<int, int> coord : check) {
-            printPair(coord);
-        }
-        std::cout << "\n";
-    }
-
     void printVisited() {
         for (std::pair<int, int> coord : visitedPairs) {
             printPair(coord);
@@ -98,7 +92,6 @@ public:
     Knight() {
         location = std::make_pair(0, 0);
         que.push(location);
-        check.push_back(location);
         visitedPairs.push_back(location);
         aRange = 0;
         bRange = 0;
@@ -108,7 +101,6 @@ public:
         location = std::make_pair(0, 0);
         bound = boundIn;
         que.push(location);
-        check.push_back(location);
         visitedPairs.push_back(location);
         aRange = aIn;
         bRange = bIn;
@@ -144,7 +136,8 @@ public:
             moves++;
             for (std::pair<int, int> curPair : currentLevel) {
                 for (funcPtr movement : funcArr) {
-                    std::pair<int, int> result = std::invoke(movement, *this, curPair);
+//                    std::pair<int, int> result = std::invoke(movement, *this, curPair);
+                    std::pair<int,int> result = CALL_MEMBER_FN(*this, movement)(curPair);
 
                     if (result == target)
                         return moves;
@@ -152,7 +145,6 @@ public:
                     if (result.first >= 0 and result.first < bound and result.second >= 0 and result.second < bound and
                         not visited(result)) {
                         que.push(result);
-                        check.push_back(result);
                         visitedPairs.push_back(result);
                     }
                 }
@@ -170,8 +162,7 @@ int main() {
 
     for (int i = 1 ; i < bound ; ++i) {
         for (int j = 1 ; j < bound ; ++j) {
-            auto* myKnight = new Knight(i, j);
-//            std::cout << "Minimum Distance:" << myKnight->breadthFirstSearch() << std::endl;
+            auto* myKnight = new Knight(i, j, bound);
             std::cout << myKnight->breadthFirstSearch() << " ";
             delete myKnight;
         }
